@@ -3,12 +3,14 @@ const express = require('express');
 const dotenv = require('dotenv');
 const cors = require('cors');
 const connectDB = require('./config/db');
-
-dotenv.config();
+const studentRoutes = require('./routes/studentRoutes');
+dotenv.config({ path: __dirname + '/.env' });
 
 
 const app = express();
-
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
+app.use('/api/students', studentRoutes);
 app.use(cors());
 app.use(express.json());
 app.use('/api/auth', require('./routes/authRoutes'));
