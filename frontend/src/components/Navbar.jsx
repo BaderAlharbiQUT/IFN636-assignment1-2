@@ -5,6 +5,7 @@ const Navbar = () => {
   const { user, logout } = useAuth();
   const navigate = useNavigate();
 
+  // Log out and send user back to login page
   const handleLogout = () => {
     logout();
     navigate('/login');
@@ -12,12 +13,15 @@ const Navbar = () => {
 
   return (
     <nav className="bg-blue-600 text-white p-4 flex justify-between items-center">
-      <Link to="/" className="text-2xl font-bold">Your apps name</Link>
+      <Link to="/" className="text-2xl font-bold">Student Attendance Manager</Link>
+
       <div>
         {user ? (
           <>
-            <Link to="/tasks" className="mr-4">CRUD</Link>
+            <Link to="/teacher-dashboard" className="mr-4">Teacher Dashboard</Link>
+            <Link to="/student-portal" className="mr-4">Student Portal</Link>
             <Link to="/profile" className="mr-4">Profile</Link>
+
             <button
               onClick={handleLogout}
               className="bg-red-500 px-4 py-2 rounded hover:bg-red-700"
