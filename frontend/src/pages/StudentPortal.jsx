@@ -4,49 +4,47 @@ import { useAuth } from '../context/AuthContext';
 
 const StudentPortal = () => {
   const { user } = useAuth();
-  const [students, setStudents] = useState([]);
-
-  const getStatus = (student) => {
-    if (student.present > 0) return 'Present';
-    if (student.absent > 0) return 'Absent';
-    if (student.late > 0) return 'Late';
-    return 'No record';
-  };
+  const [records, setRecords] = useState([]);
 
   useEffect(() => {
-    const fetchStudents = async () => {
+    const fetchSummary = async () => {
       try {
-        const response = await axiosInstance.get('/api/students', {
+        const response = await axiosInstance.get('/api/students/me/summary', {
           headers: user?.token
             ? { Authorization: `Bearer ${user.token}` }
             : {},
         });
-        setStudents(response.data);
+        setRecords(response.data);
       } catch (error) {
         alert('Failed to fetch student data.');
         console.error(error);
       }
     };
 
-    fetchStudents();
+    fetchSummary();
   }, [user]);
 
   return (
     <div className="container mx-auto p-6">
       <h1 className="text-3xl font-bold mb-6 text-center">Student Portal</h1>
 
-      {students.length === 0 ? (
+      {records.length === 0 ? (
         <p className="text-gray-500 text-center">No attendance records available.</p>
       ) : (
         <div className="grid gap-4">
-          {students.map((student) => (
-            <div key={student._id} className="bg-white shadow rounded p-4">
-              <h2 className="text-xl font-semibold">{student.name}</h2>
-              <p><strong>Student ID:</strong> {student.studentId}</p>
-              <p><strong>Email:</strong> {student.email}</p>
-              <p><strong>Course:</strong> {student.course}</p>
-              <p><strong>Status:</strong> {getStatus(student)}</p>
-              <p><strong>Attendance Rate:</strong> {student.attendanceRate}%</p>
+          {records.map((record) => (
+            <div key={record.studentRecordId} className="bg-white shadow rounded p-4">
+              <h2 className="text-xl font-semibold mb-2">{record.name}</h2>
+              <p><strong>Teacher:</strong> {record.teacher?.name}</p>
+              <p><strong>Teacher Email:</strong> {record.teacher?.email}</p>
+              <p><strong>Student ID:</strong> {record.studentId}</p>
+              <p><strong>Email:</strong> {record.email}</p>
+              <p><strong>Course:</strong> {record.course}</p>
+              <p><strong>Total Sessions:</strong> {record.totalSessions}</p>
+              <p><strong>Present:</strong> {record.presentCount}</p>
+              <p><strong>Late:</strong> {record.lateCount}</p>
+              <p><strong>Absent:</strong> {record.absentCount}</p>
+              <p><strong>Attendance Rate:</strong> {record.attendanceRate}%</p>
             </div>
           ))}
         </div>

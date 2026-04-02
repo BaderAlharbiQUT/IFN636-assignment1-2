@@ -1,17 +1,11 @@
+import { useState } from 'react';
 import { useAuth } from '../context/AuthContext';
 import axiosInstance from '../axiosConfig';
 
-const StudentList = ({ students, setStudents, setEditingStudent }) => {
+const StudentList = ({ students, setStudents, setEditingStudent, refreshStudents }) => {
   const { user } = useAuth();
+  const [activeAttendanceStudent, setActiveAttendanceStudent] = useState(null);
 
-  const getStatus = (student) => {
-    if (student.present > 0) return 'Present';
-    if (student.absent > 0) return 'Absent';
-    if (student.late > 0) return 'Late';
-    return 'No record';
-  };
-
-  // Delete one student record
   const handleDelete = async (studentId) => {
     try {
       await axiosInstance.delete(`/api/students/${studentId}`, {
@@ -23,6 +17,26 @@ const StudentList = ({ students, setStudents, setEditingStudent }) => {
       setStudents(students.filter((student) => student._id !== studentId));
     } catch (error) {
       alert('Failed to delete student.');
+    }
+  };
+
+  const handleAttendance = async (studentId, status) => {
+    try {
+      await axiosInstance.post(
+        `/api/students/${studentId}/attendance`,
+        { status },
+        {
+          headers: user?.token
+            ? { Authorization: `Bearer ${user.token}` }
+            : {},
+        }
+      );
+
+      setActiveAttendanceStudent(null);
+      refreshStudents();
+    } catch (error) {
+      alert('Failed to record attendance.');
+      console.error(error);
     }
   };
 
@@ -39,15 +53,25 @@ const StudentList = ({ students, setStudents, setEditingStudent }) => {
             <p><strong>Student ID:</strong> {student.studentId}</p>
             <p><strong>Email:</strong> {student.email}</p>
             <p><strong>Course:</strong> {student.course}</p>
-            <p><strong>Status:</strong> {getStatus(student)}</p>
+            <p><strong>Total Sessions:</strong> {student.totalSessions}</p>
+            <p><strong>Present:</strong> {student.presentCount}</p>
+            <p><strong>Late:</strong> {student.lateCount}</p>
+            <p><strong>Absent:</strong> {student.absentCount}</p>
             <p><strong>Attendance Rate:</strong> {student.attendanceRate}%</p>
 
-            <div className="mt-3">
+            <div className="mt-3 flex flex-wrap gap-2">
               <button
                 onClick={() => setEditingStudent(student)}
-                className="mr-2 bg-yellow-500 text-white px-4 py-2 rounded"
+                className="bg-yellow-500 text-white px-4 py-2 rounded"
               >
                 Edit
+              </button>
+
+              <button
+                onClick={() => setActiveAttendanceStudent(student._id)}
+                className="bg-green-600 text-white px-4 py-2 rounded"
+              >
+                Make Attendance
               </button>
 
               <button
@@ -57,6 +81,31 @@ const StudentList = ({ students, setStudents, setEditingStudent }) => {
                 Delete
               </button>
             </div>
+
+            {activeAttendanceStudent === student._id && (
+              <div className="mt-4 flex flex-wrap gap-2">
+                <button
+                  onClick={() => handleAttendance(student._id, 'Present')}
+                  className="bg-blue-600 text-white px-4 py-2 rounded"
+                >
+                  Present
+                </button>
+
+                <button
+                  onClick={() => handleAttendance(student._id, 'Late')}
+                  className="bg-orange-500 text-white px-4 py-2 rounded"
+                >
+                  Late
+                </button>
+
+                <button
+                  onClick={() => handleAttendance(student._id, 'Absent')}
+                  className="bg-gray-700 text-white px-4 py-2 rounded"
+                >
+                  Absent
+                </button>
+              </div>
+            )}
           </div>
         ))
       )}
