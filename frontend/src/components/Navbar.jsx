@@ -5,7 +5,6 @@ const Navbar = () => {
   const { user, logout } = useAuth();
   const navigate = useNavigate();
 
-  // Log out and send user back to login page
   const handleLogout = () => {
     logout();
     navigate('/login');
@@ -18,8 +17,14 @@ const Navbar = () => {
       <div>
         {user ? (
           <>
-            <Link to="/teacher-dashboard" className="mr-4">Teacher Dashboard</Link>
-            <Link to="/student-portal" className="mr-4">Student Portal</Link>
+            {user.role === 'teacher' && (
+              <Link to="/teacher-dashboard" className="mr-4">Teacher Dashboard</Link>
+            )}
+
+            {user.role === 'student' && (
+              <Link to="/student-portal" className="mr-4">Student Portal</Link>
+            )}
+
             <Link to="/profile" className="mr-4">Profile</Link>
 
             <button
