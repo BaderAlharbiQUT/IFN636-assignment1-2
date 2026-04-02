@@ -12,20 +12,35 @@ describe('CreateStudent Function Test', () => {
 
   it('should create a new student successfully', async () => {
     const req = {
+      user: {
+        id: 'teacher123',
+      },
       body: {
         name: 'Test Student',
         studentId: 'S12345',
         email: 'student@test.com',
         course: 'IFN636',
-        attendanceRate: 100,
-        totalDays: 1,
-        present: 1,
-        absent: 0,
-        late: 0,
       },
     };
 
-    const createdStudent = { _id: 'abc123', ...req.body };
+    const expectedPayload = {
+      teacherId: req.user.id,
+      name: req.body.name,
+      studentId: req.body.studentId,
+      email: req.body.email,
+      course: req.body.course,
+    };
+
+    const createdStudent = {
+      _id: 'abc123',
+      ...expectedPayload,
+      totalSessions: 0,
+      presentCount: 0,
+      lateCount: 0,
+      absentCount: 0,
+      attendanceRate: 0,
+    };
+
     const createStub = sinon.stub(Student, 'create').resolves(createdStudent);
 
     const res = {
@@ -35,13 +50,16 @@ describe('CreateStudent Function Test', () => {
 
     await createStudent(req, res);
 
-    expect(createStub.calledOnceWith(req.body)).to.be.true;
+    expect(createStub.calledOnceWith(expectedPayload)).to.be.true;
     expect(res.status.calledWith(201)).to.be.true;
     expect(res.json.calledWith(createdStudent)).to.be.true;
   });
 
   it('should return 400 when student creation fails', async () => {
     const req = {
+      user: {
+        id: 'teacher123',
+      },
       body: {
         name: 'Bad Student',
         studentId: 'S99999',
