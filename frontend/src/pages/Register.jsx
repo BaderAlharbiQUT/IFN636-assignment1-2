@@ -19,8 +19,13 @@ const Register = () => {
       alert('Registration successful. Please log in.');
       navigate('/login');
     } catch (error) {
-      alert('Registration failed. Please try again.');
-      console.error(error);
+      console.error('Register error:', error);
+      console.error('Backend message:', error?.response?.data);
+
+      alert(
+        error?.response?.data?.message ||
+        'Registration failed. Please try again.'
+      );
     }
   };
 
@@ -35,6 +40,7 @@ const Register = () => {
           value={formData.name}
           onChange={(e) => setFormData({ ...formData, name: e.target.value })}
           className="w-full mb-4 p-2 border rounded"
+          required
         />
 
         <input
@@ -43,6 +49,7 @@ const Register = () => {
           value={formData.email}
           onChange={(e) => setFormData({ ...formData, email: e.target.value })}
           className="w-full mb-4 p-2 border rounded"
+          required
         />
 
         <input
@@ -51,6 +58,7 @@ const Register = () => {
           value={formData.password}
           onChange={(e) => setFormData({ ...formData, password: e.target.value })}
           className="w-full mb-4 p-2 border rounded"
+          required
         />
 
         <select
