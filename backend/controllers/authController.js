@@ -11,6 +11,7 @@ const registerUser = async (req, res) => {
 
   try {
     const userExists = await User.findOne({ email });
+
     if (userExists) {
       return res.status(400).json({ message: 'User already exists' });
     }
@@ -19,7 +20,7 @@ const registerUser = async (req, res) => {
       name,
       email,
       password,
-      role,
+      role: role || 'student',
     });
 
     res.status(201).json({
@@ -59,6 +60,7 @@ const loginUser = async (req, res) => {
 const getProfile = async (req, res) => {
   try {
     const user = await User.findById(req.user.id);
+
     if (!user) {
       return res.status(404).json({ message: 'User not found' });
     }
@@ -78,9 +80,13 @@ const getProfile = async (req, res) => {
 const updateUserProfile = async (req, res) => {
   try {
     const user = await User.findById(req.user.id);
-    if (!user) return res.status(404).json({ message: 'User not found' });
+
+    if (!user) {
+      return res.status(404).json({ message: 'User not found' });
+    }
 
     const { name, email, university, address } = req.body;
+
     user.name = name || user.name;
     user.email = email || user.email;
     user.university = university || user.university;
@@ -102,4 +108,9 @@ const updateUserProfile = async (req, res) => {
   }
 };
 
-module.exports = { registerUser, loginUser, updateUserProfile, getProfile };
+module.exports = {
+  registerUser,
+  loginUser,
+  updateUserProfile,
+  getProfile,
+};
