@@ -3,6 +3,8 @@ import { useNavigate } from 'react-router-dom';
 import axiosInstance from '../axiosConfig';
 
 const Register = () => {
+  const navigate = useNavigate();
+
   const [formData, setFormData] = useState({
     name: '',
     email: '',
@@ -10,70 +12,82 @@ const Register = () => {
     role: 'student',
   });
 
-  const navigate = useNavigate();
+  const handleChange = (e) => {
+    setFormData({
+      ...formData,
+      [e.target.name]: e.target.value,
+    });
+  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+
     try {
       await axiosInstance.post('/api/auth/register', formData);
       alert('Registration successful. Please log in.');
       navigate('/login');
     } catch (error) {
-      console.error('Register error:', error);
-      console.error('Backend message:', error?.response?.data);
-
-      alert(
-        error?.response?.data?.message ||
-        'Registration failed. Please try again.'
-      );
+      console.error('Registration error:', error.response?.data || error.message);
+      alert('Registration failed. Please try again.');
     }
   };
 
   return (
-    <div className="max-w-md mx-auto mt-20">
-      <form onSubmit={handleSubmit} className="bg-white p-6 shadow-md rounded">
-        <h1 className="text-2xl font-bold mb-4 text-center">Register</h1>
+    <div
+      className="min-h-screen flex items-center justify-center bg-cover bg-center relative"
+      style={{ backgroundImage: "url('/login-bg.jpg')" }}
+    >
+      <div className="absolute inset-0 bg-black bg-opacity-40"></div>
 
-        <input
-          type="text"
-          placeholder="Name"
-          value={formData.name}
-          onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-          className="w-full mb-4 p-2 border rounded"
-          required
-        />
+      <div className="relative z-10 w-full max-w-md px-4">
+        <form onSubmit={handleSubmit} className="bg-white p-6 shadow-md rounded">
+          <h1 className="text-3xl font-bold mb-4 text-center">Register</h1>
 
-        <input
-          type="email"
-          placeholder="Email"
-          value={formData.email}
-          onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-          className="w-full mb-4 p-2 border rounded"
-          required
-        />
+          <input
+            type="text"
+            name="name"
+            placeholder="Name"
+            value={formData.name}
+            onChange={handleChange}
+            className="w-full mb-4 p-3 border rounded"
+            required
+          />
 
-        <input
-          type="password"
-          placeholder="Password"
-          value={formData.password}
-          onChange={(e) => setFormData({ ...formData, password: e.target.value })}
-          className="w-full mb-4 p-2 border rounded"
-          required
-        />
+          <input
+            type="email"
+            name="email"
+            placeholder="Email"
+            value={formData.email}
+            onChange={handleChange}
+            className="w-full mb-4 p-3 border rounded"
+            required
+          />
 
-        <select
-          value={formData.role}
-          onChange={(e) => setFormData({ ...formData, role: e.target.value })}
-          className="w-full mb-4 p-2 border rounded"
-        >
-          <option value="student">Student</option>
-          <option value="teacher">Teacher</option>
-        </select>
+          <input
+            type="password"
+            name="password"
+            placeholder="Password"
+            value={formData.password}
+            onChange={handleChange}
+            className="w-full mb-4 p-3 border rounded"
+            required
+          />
 
-        <button type="submit" className="w-full bg-green-600 text-white p-2 rounded">
-          Register
-        </button>
-      </form>
+          <select
+            name="role"
+            value={formData.role}
+            onChange={handleChange}
+            className="w-full mb-4 p-3 border rounded"
+          >
+            <option value="student">Student</option>
+            <option value="teacher">Teacher</option>
+          </select>
+
+          <button type="submit" className="w-full bg-green-600 text-white p-3 rounded">
+            Register
+          </button>
+        </form>
+      </div>
     </div>
   );
 };

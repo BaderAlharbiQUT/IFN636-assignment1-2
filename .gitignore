@@ -1,8 +1,11 @@
 node_modules/
 frontend/node_modules/
+frontend/build/
 backend/node_modules/
 .env
 backend/.env
+actions-runner/_work
+actions-runner/actions-runner/_work
 # See https://help.github.com/articles/ignoring-files/ for more about ignoring files.
 
 # dependencies

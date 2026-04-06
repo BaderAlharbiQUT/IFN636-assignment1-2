@@ -1,98 +1,108 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useEffect, useState } from 'react';
 import axiosInstance from '../axiosConfig';
 import StudentForm from '../components/StudentForm';
 import StudentList from '../components/StudentList';
-import { useAuth } from '../context/AuthContext';
 
 const TeacherDashboard = () => {
-  const { user } = useAuth();
   const [students, setStudents] = useState([]);
   const [editingStudent, setEditingStudent] = useState(null);
   const [showForm, setShowForm] = useState(false);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState('');
 
-  const fetchStudents = useCallback(async () => {
+  const fetchStudents = async () => {
     try {
-      const response = await axiosInstance.get('/api/students', {
-        headers: user?.token
-          ? { Authorization: `Bearer ${user.token}` }
-          : {},
-      });
+      const response = await axiosInstance.get('/api/students');
       setStudents(response.data);
+      setError('');
     } catch (error) {
-      alert('Failed to fetch students.');
-      console.error(error);
+      setError('Failed to load teacher dashboard data.');
+    } finally {
+      setLoading(false);
     }
-  }, [user]);
+  };
 
   useEffect(() => {
     fetchStudents();
-  }, [fetchStudents]);
+  }, []);
+
+  useEffect(() => {
+    if (editingStudent) {
+      setShowForm(true);
+    }
+  }, [editingStudent]);
 
   const totalStudents = students.length;
-  const totalPresent = students.reduce((sum, student) => sum + (student.presentCount || 0), 0);
-  const totalLate = students.reduce((sum, student) => sum + (student.lateCount || 0), 0);
-  const totalAbsent = students.reduce((sum, student) => sum + (student.absentCount || 0), 0);
+  const presentCount = students.reduce((sum, student) => sum + (student.presentCount || 0), 0);
+  const lateCount = students.reduce((sum, student) => sum + (student.lateCount || 0), 0);
+  const absentCount = students.reduce((sum, student) => sum + (student.absentCount || 0), 0);
 
-  const handleAddStudentClick = () => {
-    setEditingStudent(null);
-    setShowForm(true);
-  };
+  if (loading) {
+    return <div className="p-6 text-center text-xl">Loading teacher dashboard...</div>;
+  }
 
-  const handleEditStudent = (student) => {
-    setEditingStudent(student);
-    setShowForm(true);
-  };
+  if (error) {
+    return <div className="p-6 text-center text-red-600 text-xl">{error}</div>;
+  }
 
   return (
-    <div className="container mx-auto p-6">
-      <div className="flex justify-between items-center mb-6">
-        <h1 className="text-3xl font-bold">Teacher Dashboard</h1>
-        <button
-          onClick={handleAddStudentClick}
-          className="bg-blue-600 text-white px-5 py-2 rounded"
-        >
-          Add Student
-        </button>
-      </div>
+    <div
+      className="min-h-screen bg-cover bg-center p-6"
+      style={{ backgroundImage: "url('/teacher-bg.jpg')" }}
+    >
+      <div className="bg-white bg-opacity-90 rounded-lg p-6 shadow-lg">
+        <div className="flex flex-col md:flex-row md:items-center md:justify-between mb-8 gap-4">
+          <h1 className="text-4xl font-bold text-center md:text-left">Teacher Dashboard</h1>
 
-      <div className="grid md:grid-cols-4 gap-4 mb-6">
-        <div className="bg-white shadow rounded p-4">
-          <h3 className="font-semibold">Total Students</h3>
-          <p className="text-2xl font-bold">{totalStudents}</p>
+          <button
+            onClick={() => {
+              setShowForm(!showForm);
+              if (showForm) setEditingStudent(null);
+            }}
+            className="bg-blue-600 text-white px-6 py-3 rounded"
+          >
+            {showForm ? 'Close Form' : 'Add Student'}
+          </button>
         </div>
-        <div className="bg-white shadow rounded p-4">
-          <h3 className="font-semibold">Present</h3>
-          <p className="text-2xl font-bold">{totalPresent}</p>
-        </div>
-        <div className="bg-white shadow rounded p-4">
-          <h3 className="font-semibold">Late</h3>
-          <p className="text-2xl font-bold">{totalLate}</p>
-        </div>
-        <div className="bg-white shadow rounded p-4">
-          <h3 className="font-semibold">Absent</h3>
-          <p className="text-2xl font-bold">{totalAbsent}</p>
-        </div>
-      </div>
 
-      {showForm && (
-        <StudentForm
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-8">
+          <div className="bg-white shadow rounded p-5">
+            <h2 className="text-xl font-semibold">Total Students</h2>
+            <p className="text-4xl font-bold mt-2">{totalStudents}</p>
+          </div>
+
+          <div className="bg-white shadow rounded p-5">
+            <h2 className="text-xl font-semibold">Present</h2>
+            <p className="text-4xl font-bold mt-2">{presentCount}</p>
+          </div>
+
+          <div className="bg-white shadow rounded p-5">
+            <h2 className="text-xl font-semibold">Late</h2>
+            <p className="text-4xl font-bold mt-2">{lateCount}</p>
+          </div>
+
+          <div className="bg-white shadow rounded p-5">
+            <h2 className="text-xl font-semibold">Absent</h2>
+            <p className="text-4xl font-bold mt-2">{absentCount}</p>
+          </div>
+        </div>
+
+        {(showForm || editingStudent) && (
+          <StudentForm
+            students={students}
+            setStudents={setStudents}
+            editingStudent={editingStudent}
+            setEditingStudent={setEditingStudent}
+            setShowForm={setShowForm}
+          />
+        )}
+
+        <StudentList
           students={students}
           setStudents={setStudents}
-          editingStudent={editingStudent}
           setEditingStudent={setEditingStudent}
-          onClose={() => {
-            setShowForm(false);
-            setEditingStudent(null);
-          }}
         />
-      )}
-
-      <StudentList
-        students={students}
-        setStudents={setStudents}
-        setEditingStudent={handleEditStudent}
-        refreshStudents={fetchStudents}
-      />
+      </div>
     </div>
   );
 };
