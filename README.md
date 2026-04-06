@@ -1,24 +1,110 @@
+# Student Attendance Manager
 
-**Assessment 1.2 (Total Marks **20**)**
+Student Attendance Manager is a full-stack CRUD web application developed for **IFN636 Assessment 1.2**. It extends the provided starter project into a real-world attendance tracking system using **Node.js, Express, MongoDB, React.js, GitHub, and CI/CD on AWS EC2**. The application supports two user roles: **Teacher** and **Student**.
 
-Assignment: **Software requirements analysis and design (**Full-Stack CRUD Application Development with DevOps Practices**)**
+## Project Overview
 
+This system allows teachers to manage their own students and record attendance over time. Each attendance action is saved with an automatic timestamp, and the application updates attendance statistics such as total sessions, present count, late count, absent count, and attendance rate.
 
----
+Students can log in to view their own attendance summary, including their teacher details and attendance statistics for each teacher-linked student record.
 
-**Objective**
+## Main Features
 
-For this assessment, you have already been assigned a project. Your task is to develop a system that implements CRUD (Create, Read, Update, Delete) operations based on the selected project. The system should include both a user panel and an admin panel. Depending on the nature of your chosen project, you may decide how many CRUD operations are required to support the functionality of the system. You have been provided with a starter project that includes user authentication using Node.js, React.js, and MongoDB, your should extend this application based on your assigned project requirements. Ensure that the implemented features are appropriate and meaningful for your selected project. Your project should include the following:
-In this assignment you will complete the following tasks:
+### Teacher Features
+- Register and log in as a teacher
+- Access the **Teacher Dashboard**
+- Add new students
+- Edit student details
+- Delete students
+- Record attendance as:
+  - Present
+  - Late
+  - Absent
+- Automatically update:
+  - total sessions
+  - present count
+  - late count
+  - absent count
+  - attendance rate
 
-* **Basic Version Control using GitHub**
-* **Development, CI/CD Integration for Automated Deployment**
-* **Project report**
+### Student Features
+- Register and log in as a student
+- Access the **Student Portal**
+- View:
+  - teacher name
+  - teacher email
+  - course
+  - total sessions
+  - present count
+  - late count
+  - absent count
+  - attendance rate
 
- 
----
+### Authentication and Authorisation
+- Role-based registration (`teacher` or `student`)
+- JWT-based login authentication
+- Teachers can only manage **their own students**
+- Students can only view **their own attendance summary**
 
-**GitHub link of the starter project: **[https://github.com/nahaQUT/sampleapp_IFQ636.git](https://github.com/nahaQUT/sampleapp_IFQ636.git)
+## Technology Stack
 
----
+### Backend
+- Node.js
+- Express.js
+- MongoDB
+- Mongoose
+- JWT
+- bcrypt
 
+### Frontend
+- React.js
+- React Router
+- Axios
+- Tailwind CSS
+
+### DevOps / Deployment
+- GitHub
+- GitHub Actions
+- Self-hosted GitHub Actions runner on AWS EC2
+- PM2
+- Nginx
+
+## System Structure
+
+### Backend
+The backend provides REST API endpoints for:
+- user registration and login
+- teacher-owned student CRUD
+- attendance recording
+- student attendance summary
+
+### Frontend
+The frontend provides:
+- Login page
+- Register page
+- Teacher Dashboard
+- Student Portal
+- Navbar with role-based navigation
+
+## How the App Works
+
+### Teacher Workflow
+1. Register as a teacher
+2. Log in
+3. Open **Teacher Dashboard**
+4. Add a student
+5. Use **Make Attendance** to record Present / Late / Absent
+6. Dashboard statistics update automatically
+
+### Student Workflow
+1. Register as a student
+2. Log in
+3. Open **Student Portal**
+4. View attendance summary linked to teacher records
+
+## Public URL
+
+Public URL / Public IP:
+
+```text
+http://54.253.48.157:3000
